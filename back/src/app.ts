@@ -39,16 +39,7 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-const authHandler = toNodeHandler(auth);
-
-app.use('/api/auth', async (req, res, next) => {
-  try {
-    await authHandler(req, res);
-  } catch (error) {
-    console.error('❌ ERROR CRÍTIC A BETTER AUTH:', error);
-    res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
-  }
-});
+app.use('/api/auth', toNodeHandler(auth));
 
 app.use(express.json());
 
