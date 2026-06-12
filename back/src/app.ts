@@ -39,6 +39,10 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
+app.get('/api/test', (req, res) => {
+  res.json({ hola: 'el backend funciona' });
+});
+
 const authHandler = toNodeHandler(auth);
 
 app.use('/api/auth', async (req, res, next) => {
