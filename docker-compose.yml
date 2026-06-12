@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: betting_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: betting_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d betting_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: back/Dockerfile
+    container_name: betting_backend
+    ports:
+      - "4000:4000"
+    environment:
+      - PORT=4000
+      - DATABASE_URL=postgresql://postgres:mysecretpassword@postgres:5432/betting_db
+      - BETTER_AUTH_SECRET=supersecretbetterauthkey123456789012345
+      - BETTER_AUTH_URL=http://localhost:4000
+      - FRONTEND_URL=http://localhost:3000
+      - NODE_ENV=development
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_PORT=587
+      - SMTP_USER=joantonitorrandell@gmail.com
+      - SMTP_PASS=gxut hxqv mwus xwys
+      - SMTP_FROM_NAME=Apostes Control
+      - SMTP_FROM_EMAIL=joantonitorrandell@gmail.com
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: front/Dockerfile
+    container_name: betting_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:4000
+      - NEXT_PUBLIC_BETTER_AUTH_URL=http://localhost:4000
+      - NODE_ENV=development
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge
