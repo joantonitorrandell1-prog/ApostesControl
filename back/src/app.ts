@@ -17,13 +17,13 @@ import { UserController } from './infrastructure/adapters/http/controllers/user.
 import { BetController } from './infrastructure/adapters/http/controllers/bet.controller';
 import { requireAuth, requireAdmin } from './infrastructure/adapters/http/middlewares/auth.middleware';
 
-const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-
 export const app = express();
 
 app.use(cors({
-  origin: frontendUrl,
+  origin: process.env.FRONTEND_URL || "https://apostes-control-2b4h.vercel.app",
   credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 app.use('/api/auth', toNodeHandler(auth));
