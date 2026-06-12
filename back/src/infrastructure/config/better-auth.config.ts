@@ -14,8 +14,10 @@ export const auth = betterAuth({
     },
   }),
   trustedOrigins: [
-    process.env.FRONTEND_URL || 'http://localhost:3000'
-  ],
+    process.env.FRONTEND_URL,
+    'https://apostes-control-2b4h.vercel.app',
+    'http://localhost:3000',
+  ].filter(Boolean) as string[],
   emailAndPassword: {
     enabled: true,
     autoSignIn: false, // Don't auto login after creation (so user logs in explicitly)
