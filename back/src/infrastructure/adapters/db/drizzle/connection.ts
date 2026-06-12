@@ -9,6 +9,10 @@ const connectionString = process.env.DATABASE_URL || 'postgresql://postgres:myse
 
 export const pool = new Pool({
   connectionString,
+  max: 3,
+  connectionTimeoutMillis: 10000,
+  idleTimeoutMillis: 30000,
+  ssl: { rejectUnauthorized: false },
 });
 
 export const db = drizzle(pool, { schema });
