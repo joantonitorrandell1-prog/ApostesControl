@@ -11,7 +11,8 @@
     "clean": "rm -rf dist",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:push": "drizzle-kit push"
+    "db:push": "drizzle-kit push",
+    "install": "npm install --legacy-peer-deps"
   },
   "dependencies": {
     "better-auth": "^1.1.1",
