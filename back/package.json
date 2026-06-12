@@ -11,14 +11,13 @@
     "clean": "rm -rf dist",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:push": "drizzle-kit push",
-    "install": "npm install --legacy-peer-deps"
+    "db:push": "drizzle-kit push"
   },
   "dependencies": {
     "better-auth": "^1.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "drizzle-orm": "^0.30.10",
+    "drizzle-orm": "^0.31.0",
     "express": "^4.19.2",
     "nodemailer": "^8.0.11",
     "pg": "^8.11.5"
@@ -29,7 +28,7 @@
     "@types/node": "^20.12.7",
     "@types/nodemailer": "^8.0.1",
     "@types/pg": "^8.11.5",
-    "drizzle-kit": "^0.21.4",
+    "drizzle-kit": "^0.31.4",
     "tsx": "^4.7.2",
     "typescript": "^5.4.5"
   }
