@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "tsx watch src/main.ts",
     "build": "tsc",
-    "vercel-build": "tsc",
     "start": "node dist/src/main.js",
     "seed": "tsx scripts/seed.ts",
     "clean": "rm -rf dist",

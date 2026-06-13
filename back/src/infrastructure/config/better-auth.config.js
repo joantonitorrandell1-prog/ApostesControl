@@ -1,14 +1,14 @@
-import { db } from '../adapters/db/drizzle/connection';
-import * as schema from '../adapters/db/drizzle/schema';
+const { db } = require('../adapters/db/drizzle/connection');
+const schema = require('../adapters/db/drizzle/schema');
 
-let authInstance: any = null;
+let authInstance = null;
 
-export async function getAuth() {
+async function getAuth() {
   if (authInstance) return authInstance;
 
   const [{ betterAuth }, { drizzleAdapter }] = await Promise.all([
-    import('better-auth') as Promise<{ betterAuth: any }>,
-    import('better-auth/adapters/drizzle') as Promise<{ drizzleAdapter: any }>,
+    import('better-auth'),
+    import('better-auth/adapters/drizzle'),
   ]);
 
   authInstance = betterAuth({
@@ -26,7 +26,7 @@ export async function getAuth() {
     trustedOrigins: [
       process.env.FRONTEND_URL,
       'http://localhost:3000',
-    ].filter(Boolean) as string[],
+    ].filter(Boolean),
     emailAndPassword: {
       enabled: true,
       autoSignIn: false,
@@ -48,3 +48,10 @@ export async function getAuth() {
 
   return authInstance;
 }
+
+async function getToNodeHandler() {
+  const mod = await import('better-auth/node');
+  return mod.toNodeHandler;
+}
+
+module.exports = { getAuth, getToNodeHandler };
