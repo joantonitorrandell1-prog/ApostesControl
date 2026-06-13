@@ -42,51 +42,30 @@ app.get('/api/test', (req, res) => {
 });
 
 app.get('/api/debug/imports', async (req, res) => {
-  const results: Record<string, any> = {};
-  try {
-    const ba = await import('better-auth');
-    results['better-auth'] = { ok: true, keys: Object.keys(ba) };
-  } catch (e: any) {
-    results['better-auth'] = { ok: false, error: e.message, code: e.code };
-  }
-  try {
-    const ad = await import('better-auth/adapters/drizzle');
-    results['better-auth/adapters/drizzle'] = { ok: true, keys: Object.keys(ad) };
-  } catch (e: any) {
-    results['better-auth/adapters/drizzle'] = { ok: false, error: e.message, code: e.code };
-  }
-  try {
-    const bn = await import('better-auth/node');
-    results['better-auth/node'] = { ok: true, keys: Object.keys(bn) };
-  } catch (e: any) {
-    results['better-auth/node'] = { ok: false, error: e.message, code: e.code };
+  const results: any = {};
+  for (const mod of ['better-auth', 'better-auth/adapters/drizzle', 'better-auth/node']) {
+    try { const m = await import(mod); results[mod] = { ok: true, keys: Object.keys(m) }; }
+    catch (e: any) { results[mod] = { ok: false, error: '' + (e?.message || e) }; }
   }
   res.json(results);
 });
 
 app.get('/api/debug/auth', async (req, res) => {
-  try {
-    const auth = await getAuth();
-    res.json({ ok: true, hasAuth: !!auth, authKeys: Object.keys(auth) });
-  } catch (e: any) {
-    res.status(500).json({ ok: false, error: e.message, code: e.code, stack: e.stack?.split('\n').slice(0, 5) });
-  }
+  try { const auth = await getAuth(); res.json({ ok: true }); }
+  catch (e: any) { res.status(500).json({ ok: false, error: '' + (e?.message || e), code: e?.code }); }
 });
 
 app.use('/api/auth', async (req, res, next) => {
   try {
-    console.log('[auth] starting...');
     const auth = await getAuth();
-    console.log('[auth] got auth instance');
     const { toNodeHandler } = await import('better-auth/node') as any;
-    console.log('[auth] got node handler');
     const handler = toNodeHandler(auth);
-    console.log('[auth] calling handler');
     await handler(req, res);
-    console.log('[auth] handler done');
   } catch (error) {
-    console.error('❌ ERROR CRÍTIC A BETTER AUTH:', error);
-    res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+    console.error('AUTH ERROR:', error);
+    if (!res.headersSent) {
+      res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+    }
   }
 });
 
