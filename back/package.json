@@ -1,7 +1,7 @@
 {
   "name": "bet-control-backend",
   "version": "1.0.0",
-  "type": "module",
+
   "description": "Bet Control Hexagonal Backend",
   "main": "dist/src/main.js",
   "scripts": {
