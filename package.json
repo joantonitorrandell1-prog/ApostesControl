@@ -1,5 +1,10 @@
 {
   "private": true,
-  "workspaces": ["front", "back"],
-  "vercel-build": "cd front && next build"
+  "workspaces": [
+    "front",
+    "back"
+  ],
+  "scripts": {
+    "vercel-build": "npm run build --workspace=front"
+  }
 }
