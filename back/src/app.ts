@@ -41,15 +41,17 @@ app.get('/api/test', (req, res) => {
   res.json({ hola: 'el backend funciona' });
 });
 
-app.use('/api/auth', async (req, res, next) => {
+app.all('/api/auth/*', async (req, res, next) => {
   try {
     const auth = await getAuth();
     const { toNodeHandler } = await import('better-auth/node') as any;
     const handler = toNodeHandler(auth);
     await handler(req, res);
+    if (!res.headersSent) next();
   } catch (error) {
-    console.error('❌ ERROR CRÍTIC A BETTER AUTH:', error);
-    res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+    if (!res.headersSent) {
+      res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+    }
   }
 });
 
