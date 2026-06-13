@@ -42,9 +42,17 @@ app.get('/api/test', (req, res) => {
   res.json({ hola: 'el backend funciona' });
 });
 
-const authHandler = toNodeHandler(auth);
+let authHandler: ReturnType<typeof toNodeHandler> | null = null;
+try {
+  authHandler = toNodeHandler(auth);
+} catch (error) {
+  console.error('❌ Failed to initialize auth handler:', error);
+}
 
 app.use('/api/auth', async (req, res, next) => {
+  if (!authHandler) {
+    return res.status(500).json({ error: 'Auth handler not initialized' });
+  }
   try {
     await authHandler(req, res);
   } catch (error) {
@@ -91,5 +99,13 @@ app.patch('/api/bets/:id', requireAuth, betController.updateBetStatus);
 app.delete('/api/bets/:id', requireAuth, betController.deleteBet);
 
 app.get('/api/stats', requireAuth, betController.getDashboardStats);
+
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error('❌ Unhandled error:', err);
+  res.status(500).json({
+    error: err instanceof Error ? err.message : String(err),
+    stack: process.env.NODE_ENV === 'development' ? (err instanceof Error ? err.stack : undefined) : undefined,
+  });
+});
 
 export default app;
