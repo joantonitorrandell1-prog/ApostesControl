@@ -1,11 +1,7 @@
 {
   "name": "bet-control-backend",
   "version": "1.0.0",
-  "type": "module",
   "description": "Bet Control Hexagonal Backend",
-  "ncc": {
-    "external": ["better-auth"]
-  },
   "main": "dist/src/main.js",
   "scripts": {
     "dev": "tsx watch src/main.ts",
