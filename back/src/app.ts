@@ -21,7 +21,6 @@ export const app = express();
 
 const allowedOrigins = [
   process.env.FRONTEND_URL,
-  'https://apostes-control-2b4h.vercel.app',
   'http://localhost:3000',
 ].filter(Boolean) as string[];
 

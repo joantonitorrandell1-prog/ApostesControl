@@ -13,9 +13,9 @@ export const auth = betterAuth({
       verification: schema.verification,
     },
   }),
+  baseURL: process.env.BETTER_AUTH_URL || process.env.FRONTEND_URL || 'http://localhost:3000',
   trustedOrigins: [
     process.env.FRONTEND_URL,
-    'https://apostes-control-2b4h.vercel.app',
     'http://localhost:3000',
   ].filter(Boolean) as string[],
   emailAndPassword: {
