@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { auth } from '../../../config/better-auth.config';
+import { getAuth } from '../../../config/better-auth.config';
 
 // Extend Express Request type
 export interface AuthenticatedRequest extends Request {
@@ -15,6 +15,7 @@ export interface AuthenticatedRequest extends Request {
 
 export async function requireAuth(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   try {
+    const auth = await getAuth();
     const session = await auth.api.getSession({
       headers: new Headers(req.headers as any),
     });

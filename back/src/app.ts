@@ -1,8 +1,7 @@
 import express from 'express';
 import cors from 'cors';
-import { toNodeHandler } from 'better-auth/node';
 
-import { auth } from './infrastructure/config/better-auth.config';
+import { getAuth } from './infrastructure/config/better-auth.config';
 import { DrizzleUserRepository } from './infrastructure/adapters/db/drizzle/repositories/drizzle-user-repo';
 import { DrizzleSportRepository } from './infrastructure/adapters/db/drizzle/repositories/drizzle-sport-repo';
 import { DrizzleCompetitionRepository } from './infrastructure/adapters/db/drizzle/repositories/drizzle-competition-repo';
@@ -42,19 +41,12 @@ app.get('/api/test', (req, res) => {
   res.json({ hola: 'el backend funciona' });
 });
 
-let authHandler: ReturnType<typeof toNodeHandler> | null = null;
-try {
-  authHandler = toNodeHandler(auth);
-} catch (error) {
-  console.error('❌ Failed to initialize auth handler:', error);
-}
-
 app.use('/api/auth', async (req, res, next) => {
-  if (!authHandler) {
-    return res.status(500).json({ error: 'Auth handler not initialized' });
-  }
   try {
-    await authHandler(req, res);
+    const auth = await getAuth();
+    const { toNodeHandler } = await import('better-auth/node') as any;
+    const handler = toNodeHandler(auth);
+    await handler(req, res);
   } catch (error) {
     console.error('❌ ERROR CRÍTIC A BETTER AUTH:', error);
     res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
