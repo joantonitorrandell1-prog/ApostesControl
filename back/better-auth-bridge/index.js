@@ -1,9 +1,21 @@
-const { db } = require('../adapters/db/drizzle/connection');
-const schema = require('../adapters/db/drizzle/schema');
+// Native JavaScript bridge for better-auth (ESM-only).
+// Lives in node_modules (via file: dependency), so esbuild does NOT bundle it.
+// Native import() calls are preserved at runtime.
 
+let db, schema;
 let authInstance = null;
+let initialized = false;
+
+function _requireDb() {
+  if (!initialized) {
+    db = require('../src/infrastructure/adapters/db/drizzle/connection').db;
+    schema = require('../src/infrastructure/adapters/db/drizzle/schema');
+    initialized = true;
+  }
+}
 
 async function getAuth() {
+  _requireDb();
   if (authInstance) return authInstance;
 
   const [{ betterAuth }, { drizzleAdapter }] = await Promise.all([
@@ -34,14 +46,8 @@ async function getAuth() {
     },
     user: {
       additionalFields: {
-        role: {
-          type: 'string',
-          defaultValue: 'USER',
-        },
-        requirePasswordChange: {
-          type: 'boolean',
-          defaultValue: false,
-        },
+        role: { type: 'string', defaultValue: 'USER' },
+        requirePasswordChange: { type: 'boolean', defaultValue: false },
       },
     },
   });

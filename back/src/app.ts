@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 
-import { getAuth, getToNodeHandler } from './infrastructure/config/better-auth.config';
+import { getAuth, getToNodeHandler } from 'better-auth-bridge';
 import { DrizzleUserRepository } from './infrastructure/adapters/db/drizzle/repositories/drizzle-user-repo';
 import { DrizzleSportRepository } from './infrastructure/adapters/db/drizzle/repositories/drizzle-sport-repo';
 import { DrizzleCompetitionRepository } from './infrastructure/adapters/db/drizzle/repositories/drizzle-competition-repo';

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { getAuth } from '../../../config/better-auth.config';
+import { getAuth } from 'better-auth-bridge';
 
 // Extend Express Request type
 export interface AuthenticatedRequest extends Request {
