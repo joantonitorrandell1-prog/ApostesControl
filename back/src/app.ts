@@ -91,3 +91,5 @@ app.patch('/api/bets/:id', requireAuth, betController.updateBetStatus);
 app.delete('/api/bets/:id', requireAuth, betController.deleteBet);
 
 app.get('/api/stats', requireAuth, betController.getDashboardStats);
+
+export default app;
