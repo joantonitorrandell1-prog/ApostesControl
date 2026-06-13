@@ -1,4 +1,5 @@
 {
   "private": true,
-  "workspaces": ["front", "back"]
+  "workspaces": ["front", "back"],
+  "vercel-build": "cd front && next build"
 }
