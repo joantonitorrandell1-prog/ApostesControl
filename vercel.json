@@ -1,0 +1,15 @@
+{
+  "builds": [
+    {
+      "src": "front/package.json",
+      "use": "@vercel/next"
+    },
+    {
+      "src": "api/index.ts",
+      "use": "@vercel/node"
+    }
+  ],
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index" }
+  ]
+}
