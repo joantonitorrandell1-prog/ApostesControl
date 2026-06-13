@@ -41,31 +41,15 @@ app.get('/api/test', (req, res) => {
   res.json({ hola: 'el backend funciona' });
 });
 
-app.get('/api/debug/imports', async (req, res) => {
-  const results: any = {};
-  for (const mod of ['better-auth', 'better-auth/adapters/drizzle', 'better-auth/node']) {
-    try { const m = await import(mod); results[mod] = { ok: true, keys: Object.keys(m) }; }
-    catch (e: any) { results[mod] = { ok: false, error: '' + (e?.message || e) }; }
-  }
-  res.json(results);
-});
-
-app.get('/api/debug/auth', async (req, res) => {
-  try { const auth = await getAuth(); res.json({ ok: true }); }
-  catch (e: any) { res.status(500).json({ ok: false, error: '' + (e?.message || e), code: e?.code }); }
-});
-
-app.all('/api/auth/*', async (req, res, next) => {
+app.use('/api/auth', async (req, res, next) => {
   try {
     const auth = await getAuth();
     const { toNodeHandler } = await import('better-auth/node') as any;
     const handler = toNodeHandler(auth);
     await handler(req, res);
-    if (!res.headersSent) next();
   } catch (error) {
-    if (!res.headersSent) {
-      res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
-    }
+    console.error('❌ ERROR CRÍTIC A BETTER AUTH:', error);
+    res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
   }
 });
 
