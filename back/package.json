@@ -16,13 +16,14 @@
   },
   "dependencies": {
     "better-auth": "^1.1.1",
+    "better-auth-bridge": "file:better-auth-bridge",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.45.2",
     "express": "^4.19.2",
+    "next": "16.2.9",
     "nodemailer": "^8.0.11",
-    "pg": "^8.11.5",
-    "better-auth-bridge": "file:better-auth-bridge"
+    "pg": "^8.11.5"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
@@ -30,7 +31,7 @@
     "@types/node": "^20.12.7",
     "@types/nodemailer": "^8.0.1",
     "@types/pg": "^8.11.5",
-    "drizzle-kit": "^0.30.5",
+    "drizzle-kit": "^0.31.10",
     "tsx": "^4.7.2",
     "typescript": "^5.4.5"
   }
