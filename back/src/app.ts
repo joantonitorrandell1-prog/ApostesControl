@@ -50,6 +50,10 @@ app.get('/api/test', (req, res) => {
 });
 
 app.all('/api/auth/*', async (req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+
   try {
     const { db } = await import('./infrastructure/adapters/db/drizzle/connection.js');
     const schema = await import('./infrastructure/adapters/db/drizzle/schema.js');
