@@ -144,7 +144,7 @@ export default function CompetitionPage({
     setEditingBetId(bet.id);
     setEditAmount(bet.amount.toString());
     setEditOdds(bet.odds.toString());
-    setEditPick(bet.pick || '');
+    setEditPick((bet as any).pick || '');
   };
 
   const saveInlineEdit = async (betId: string) => {
@@ -444,7 +444,7 @@ export default function CompetitionPage({
                     <tr key={b.id} className="hover:bg-slate-900/10 transition align-middle">
                       <td className="px-6 py-4">
                         <div className="text-xs text-slate-400">{new Date(b.date).toLocaleDateString('ca-ES')}</div>
-                        <div className="text-xs font-bold text-slate-500 uppercase tracking-tight">{b.bookmaker || 'Bet365'}</div>
+                        <div className="text-xs font-bold text-slate-500 uppercase tracking-tight">{(b as any).bookmaker || 'Bet365'}</div>
                       </td>
 
                       <td className="px-6 py-4">
@@ -457,8 +457,8 @@ export default function CompetitionPage({
                           />
                         ) : (
                           <>
-                            <div className="font-semibold text-white text-sm">{b.pick || 'Sense descripció'}</div>
-                            <div className="text-[10px] text-slate-500 font-bold">{b.type || 'SIMPLE'} {b.isBonusCredit && '• (Bo)'}</div>
+                            <div className="font-semibold text-white text-sm">{(b as any).pick || 'Sense descripció'}</div>
+                            <div className="text-[10px] text-slate-500 font-bold">{(b as any).type || 'SIMPLE'} {b.isBonusCredit && '• (Bo)'}</div>
                           </>
                         )}
                       </td>
@@ -491,7 +491,7 @@ export default function CompetitionPage({
 
                       <td className="px-6 py-4">
                         <span className="text-xs font-semibold bg-slate-950 px-2 py-1 border border-slate-800 rounded-md text-amber-500">
-                          {b.stake || 1}
+                          {(b as any).stake || 1}
                         </span>
                       </td>
 
