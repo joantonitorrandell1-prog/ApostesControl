@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { apiClient } from '@/lib/api-client';
 import { SportDTO, CompetitionDTO, BetDTO, BetStatus } from '@/@types/contract';
 import { 
@@ -14,9 +14,9 @@ import { useRouter } from 'next/navigation';
 export default function CompetitionPage({ 
   params 
 }: { 
-  params: { sportId: string; competitionId: string } 
+  params: Promise<{ sportId: string; competitionId: string }> 
 }) {
-  const { sportId, competitionId } = params;
+  const { sportId, competitionId } = use(params);
   const router = useRouter();
 
   const [sport, setSport] = useState<SportDTO | null>(null);
