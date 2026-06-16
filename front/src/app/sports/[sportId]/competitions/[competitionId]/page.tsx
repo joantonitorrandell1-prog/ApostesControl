@@ -5,8 +5,8 @@ import { apiClient } from '@/lib/api-client';
 import { SportDTO, CompetitionDTO, BetDTO, BetStatus } from '@/@types/contract';
 import { 
   Plus, Trash2, Calendar, Edit2, Check, HelpCircle, 
-  CheckCircle, XCircle, Percent, Coins, Sparkles, BookOpen, 
-  Star, ArrowLeft, Ban, DollarSign, Trophy
+  CheckCircle, XCircle, Percent, Coins, Sparkles, 
+  ArrowLeft, Ban, DollarSign, Trophy, ChevronLeft, ChevronRight, Filter
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -24,14 +24,20 @@ export default function CompetitionPage({
   const [bets, setBets] = useState<BetDTO[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Estats del formulari d'alta
+  // Filtres de la taula
+  const [statusFilter, setStatusFilter] = useState<string>('ALL');
+  const [startDateFilter, setStartDateFilter] = useState<string>('');
+  const [endDateFilter, setEndDateFilter] = useState<string>('');
+
+  // Paginació (10 ítems per pàgina)
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const itemsPerPage = 10;
+
+  // Estats del formulari d'alta (Simplificat)
   const [matchName, setMatchName] = useState('');
-  const [pick, setPick] = useState('');
-  const [bookmaker, setBookmaker] = useState('');
   const [amount, setAmount] = useState('');
   const [odds, setOdds] = useState('');
   const [stake, setStake] = useState('1');
-  const [betType, setBetType] = useState<'SIMPLE' | 'COMBINADA'>('SIMPLE');
   const [isBonusCredit, setIsBonusCredit] = useState(false);
   const [status, setStatus] = useState<string>('PENDING');
   const [cashOutAmount, setCashOutAmount] = useState('');
@@ -44,7 +50,6 @@ export default function CompetitionPage({
   const [editingBetId, setEditingBetId] = useState<string | null>(null);
   const [editAmount, setEditAmount] = useState('');
   const [editOdds, setEditOdds] = useState('');
-  const [editPick, setEditPick] = useState('');
   const [editMatch, setEditMatch] = useState('');
 
   const fetchData = async () => {
@@ -69,6 +74,10 @@ export default function CompetitionPage({
     fetchData();
   }, [sportId, competitionId]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [statusFilter, startDateFilter, endDateFilter]);
+
   const handleCreateBet = async (e: React.FormEvent) => {
     e.preventDefault();
     const parsedAmount = parseFloat(amount);
@@ -78,10 +87,6 @@ export default function CompetitionPage({
 
     if (!matchName.trim()) {
       alert('Si us plau, especifica el Partit / Esdeveniment.');
-      return;
-    }
-    if (!pick.trim()) {
-      alert('Si us plau, especifica el Pronòstic (Pick).');
       return;
     }
     if (isNaN(parsedAmount) || isNaN(parsedOdds) || parsedAmount <= 0 || parsedOdds <= 1) {
@@ -96,12 +101,9 @@ export default function CompetitionPage({
         body: JSON.stringify({
           competitionId,
           matchName,
-          pick,
-          bookmaker: bookmaker || 'Desconeguda',
           amount: parsedAmount,
           odds: parsedOdds,
           stake: parsedStake,
-          type: betType,
           isBonusCredit,
           status: status === 'VOID' || status === 'CASH_OUT' ? 'PENDING' : status,
           customStatus: status,
@@ -112,8 +114,6 @@ export default function CompetitionPage({
 
       setBets([created, ...bets]);
       setMatchName('');
-      setPick('');
-      setBookmaker('');
       setAmount('');
       setOdds('');
       setStake('1');
@@ -154,7 +154,6 @@ export default function CompetitionPage({
     setEditingBetId(bet.id);
     setEditAmount(bet.amount.toString());
     setEditOdds(bet.odds.toString());
-    setEditPick((bet as any).pick || '');
     setEditMatch((bet as any).matchName || '');
   };
 
@@ -173,7 +172,6 @@ export default function CompetitionPage({
         body: JSON.stringify({
           amount: parsedAmount,
           odds: parsedOdds,
-          pick: editPick,
           matchName: editMatch
         }),
       });
@@ -183,6 +181,32 @@ export default function CompetitionPage({
       alert("Error modificant l'aposta");
     }
   };
+
+  // --- LÒGICA DE FILTRATGE FRONTEND ---
+  const filteredBets = bets.filter((b) => {
+    if (statusFilter !== 'ALL' && (b.status as string) !== statusFilter) {
+      return false;
+    }
+
+    const betDateStr = new Date(b.date).toISOString().split('T')[0];
+
+    if (startDateFilter && betDateStr < startDateFilter) {
+      return false;
+    }
+
+    if (endDateFilter && betDateStr > endDateFilter) {
+      return false;
+    }
+
+    return true;
+  });
+
+  // --- LÒGICA DE PAGINACIÓ ---
+  const totalItems = filteredBets.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentBets = filteredBets.slice(indexOfFirstItem, indexOfLastItem);
 
   if (loading && !competition) {
     return (
@@ -208,83 +232,43 @@ export default function CompetitionPage({
             <span>{competition?.name}</span>
             <span className="text-slate-500 font-normal">/ Registre</span>
           </h1>
-          <p className="text-slate-400 mt-1">Full d'anàlisi d'apostes esportives.</p>
+          <p className="text-slate-400 mt-1">Full d'anàlisi dinàmic d'apostes esportives.</p>
         </div>
 
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          className="flex items-center gap-1.5 px-4 py-2.5 bg-accent-green hover:bg-emerald-600 text-slate-950 rounded-xl text-xs font-bold transition duration-300 self-start sm:self-center"
+          className="flex items-center gap-1.5 px-4 py-2.5 bg-accent-green hover:bg-emerald-600 text-slate-950 rounded-xl text-xs font-bold transition duration-300 self-start sm:self-center shadow-[0_0_15px_rgba(16,185,129,0.15)]"
         >
           <Plus className="w-4 h-4" />
           <span>Afegir Nova Aposta</span>
         </button>
       </div>
 
+      {/* Formulari Simplificat */}
       {showAddForm && (
-        <form onSubmit={handleCreateBet} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 space-y-4">
+        <form onSubmit={handleCreateBet} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 space-y-4 animate-fadeIn">
           <h2 className="text-lg font-bold text-white flex items-center gap-2">
             <Plus className="w-5 h-5 text-accent-green" />
             <span>Especificacions de la Inversió</span>
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Partit / Esdeveniment</label>
-              <div className="relative">
-                <Trophy className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                <input
-                  type="text"
-                  value={matchName}
-                  onChange={(e) => setMatchName(e.target.value)}
-                  placeholder="Ex: Barcelona vs Real Madrid"
-                  className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:border-accent-green focus:outline-none text-white text-sm"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Pronòstic / Pick</label>
-              <div className="relative">
-                <BookOpen className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                <input
-                  type="text"
-                  value={pick}
-                  onChange={(e) => setPick(e.target.value)}
-                  placeholder="Ex: Barcelona guanya"
-                  className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:border-accent-green focus:outline-none text-white text-sm"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Casa d'apostes</label>
-              <div className="relative">
-                <Star className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                <input
-                  type="text"
-                  value={bookmaker}
-                  onChange={(e) => setBookmaker(e.target.value)}
-                  placeholder="Ex: Bet365"
-                  className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:border-accent-green focus:outline-none text-white text-sm"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Tipus</label>
-              <select
-                value={betType}
-                onChange={(e) => setBetType(e.target.value as any)}
-                className="w-full px-4 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:border-accent-green focus:outline-none text-white text-sm"
-              >
-                <option value="SIMPLE">Simple</option>
-                <option value="COMBINADA">Combinada</option>
-              </select>
+          {/* Fila 1: Només Partit */}
+          <div className="space-y-1.5 w-full">
+            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Partit / Esdeveniment</label>
+            <div className="relative w-full">
+              <Trophy className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+              <input
+                type="text"
+                value={matchName}
+                onChange={(e) => setMatchName(e.target.value)}
+                placeholder="Ex: Barcelona vs Real Madrid"
+                className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:border-accent-green focus:outline-none text-white text-sm"
+                required
+              />
             </div>
           </div>
 
+          {/* Fila 2: Valors Financers */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Import (€)</label>
@@ -408,22 +392,70 @@ export default function CompetitionPage({
         </form>
       )}
 
+      {/* --- BLOC DE FILTRES --- */}
+      <div className="bg-slate-900/30 p-4 rounded-xl border border-slate-800/80 flex flex-col md:flex-row items-end md:items-center justify-between gap-4">
+        <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-wider">
+          <Filter className="w-4 h-4 text-accent-cyan" />
+          <span>Filtres de Cerca</span>
+        </div>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full md:w-auto flex-1 max-w-3xl">
+          <div className="space-y-1">
+            <span className="text-[10px] uppercase font-bold text-slate-500">Filtrar per Estat</span>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full px-3 py-1.5 bg-slate-950 border border-slate-800 text-slate-200 rounded-lg text-xs focus:outline-none focus:border-accent-cyan"
+            >
+              <option value="ALL">Totes les apostes</option>
+              <option value="PENDING">Pendents</option>
+              <option value="WON">Guanyades</option>
+              <option value="LOST">Perdudes</option>
+              <option value="VOID">Void / Nul·les</option>
+              <option value="CASH_OUT">Cash Out</option>
+            </select>
+          </div>
+
+          <div className="space-y-1">
+            <span className="text-[10px] uppercase font-bold text-slate-500">Des de (Data)</span>
+            <input
+              type="date"
+              value={startDateFilter}
+              onChange={(e) => setStartDateFilter(e.target.value)}
+              className="w-full px-3 py-1.5 bg-slate-950 border border-slate-800 text-slate-200 rounded-lg text-xs focus:outline-none focus:border-accent-cyan"
+            />
+          </div>
+
+          <div className="space-y-1">
+            <span className="text-[10px] uppercase font-bold text-slate-500">Fins a (Data)</span>
+            <input
+              type="date"
+              value={endDateFilter}
+              onChange={(e) => setEndDateFilter(e.target.value)}
+              className="w-full px-3 py-1.5 bg-slate-950 border border-slate-800 text-slate-200 rounded-lg text-xs focus:outline-none focus:border-accent-cyan"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* --- PANEL DE LA TAULA --- */}
       <div className="bg-slate-900/40 rounded-2xl border border-slate-800 overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-800 bg-slate-900/20">
+        <div className="px-6 py-4 border-b border-slate-800 bg-slate-900/20 flex items-center justify-between">
           <h2 className="text-lg font-bold text-white">Full de Càlcul Històric</h2>
+          <span className="text-xs text-slate-500 font-medium">Mostrant {currentBets.length} de {totalItems} apostes</span>
         </div>
 
-        {bets.length === 0 ? (
+        {currentBets.length === 0 ? (
           <div className="text-center py-12 text-slate-500 text-sm">
-            Manca d'apostes introduïdes en aquesta carpeta.
+            Cap aposta coincideix amb els filtres seleccionats.
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-slate-200 border-collapse">
               <thead className="bg-slate-950/40 text-[10px] uppercase font-bold text-slate-400 tracking-wider border-b border-slate-800">
                 <tr>
-                  <th className="px-6 py-3.5">Data i Bookie</th>
-                  <th className="px-6 py-3.5">Partit i Pronòstic</th>
+                  <th className="px-6 py-3.5">Data</th>
+                  <th className="px-6 py-3.5">Partit / Esdeveniment</th>
                   <th className="px-6 py-3.5">Import</th>
                   <th className="px-6 py-3.5">Quota</th>
                   <th className="px-6 py-3.5">Stake</th>
@@ -433,40 +465,29 @@ export default function CompetitionPage({
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60">
-                {bets.map((b) => {
+                {currentBets.map((b) => {
                   const isEditing = editingBetId === b.id;
                   const currentStatus = b.status as string;
 
                   return (
                     <tr key={b.id} className="hover:bg-slate-900/10 transition align-middle">
-                      <td className="px-6 py-4">
-                        <div className="text-xs text-slate-400">{new Date(b.date).toLocaleDateString('ca-ES')}</div>
-                        <div className="text-xs font-bold text-slate-500 uppercase tracking-tight">{(b as any).bookmaker || 'Bet365'}</div>
+                      <td className="px-6 py-4 text-xs text-slate-400">
+                        {new Date(b.date).toLocaleDateString('ca-ES')}
                       </td>
 
                       <td className="px-6 py-4 border-slate-800">
                         {isEditing ? (
-                          <div className="space-y-1">
-                            <input
-                              type="text"
-                              value={editMatch}
-                              onChange={(e) => setEditMatch(e.target.value)}
-                              className="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs text-white w-full"
-                              placeholder="Partit"
-                            />
-                            <input
-                              type="text"
-                              value={editPick}
-                              onChange={(e) => setEditPick(e.target.value)}
-                              className="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs text-slate-300 w-full"
-                              placeholder="Pronòstic"
-                            />
-                          </div>
+                          <input
+                            type="text"
+                            value={editMatch}
+                            onChange={(e) => setEditMatch(e.target.value)}
+                            className="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs text-white w-full"
+                            placeholder="Modificar Partit"
+                          />
                         ) : (
                           <>
-                            <div className="font-bold text-slate-400 text-xs">{(b as any).matchName || 'Partit general'}</div>
-                            <div className="font-semibold text-white text-sm">{(b as any).pick || 'Sense pronòstic'}</div>
-                            <div className="text-[10px] text-slate-500 font-bold">{(b as any).type || 'SIMPLE'} {b.isBonusCredit && '• (Bo)'}</div>
+                            <div className="font-semibold text-white text-sm">{(b as any).matchName || 'Partit general'}</div>
+                            {b.isBonusCredit && <div className="text-[10px] text-amber-500 font-bold tracking-wide">Saldo de Bo</div>}
                           </>
                         )}
                       </td>
@@ -544,7 +565,7 @@ export default function CompetitionPage({
                             <button
                               onClick={() => saveInlineEdit(b.id)}
                               className="p-1.5 rounded-lg text-accent-green bg-emerald-500/10 border border-emerald-500/20"
-                              title="Desar canvis"
+                              title="Desar"
                             >
                               <Check className="w-4 h-4" />
                             </button>
@@ -573,6 +594,49 @@ export default function CompetitionPage({
             </table>
           </div>
         )}
+
+        {/* --- PAGINACIÓ --- */}
+        <div className="px-6 py-4 bg-slate-950/20 border-t border-slate-800 flex items-center justify-between gap-4">
+          <div className="text-xs text-slate-500 font-semibold">
+            Pàgina {currentPage} de {totalPages}
+          </div>
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white disabled:opacity-30 disabled:hover:text-slate-400 transition"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            
+            <div className="flex items-center gap-1">
+              {[...Array(totalPages)].map((_, index) => {
+                const pageNum = index + 1;
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={`px-2.5 py-1 rounded-md text-xs font-bold transition ${
+                      currentPage === pageNum 
+                        ? 'bg-accent-cyan text-slate-950 shadow-sm' 
+                        : 'bg-slate-900/60 border border-slate-800 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+            </div>
+
+            <button
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white disabled:opacity-30 disabled:hover:text-slate-400 transition"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
