@@ -12,9 +12,10 @@ async function getAuth(db, schema) {
 
   const isProd = process.env.NODE_ENV === 'production';
 
-  const [{ betterAuth }, { drizzleAdapter }] = await Promise.all([
+  const [{ betterAuth }, { drizzleAdapter }, { bearer }] = await Promise.all([
     import('better-auth'),
     import('better-auth/adapters/drizzle'),
+    import('better-auth/plugins'),
   ]);
 
   authInstance = betterAuth({
@@ -27,6 +28,7 @@ async function getAuth(db, schema) {
         verification: schema.verification,
       },
     }),
+    plugins: [bearer()],
     secret: process.env.BETTER_AUTH_SECRET || 'supersecretbetterauthkey123456789012345',
     baseURL: process.env.BETTER_AUTH_URL || process.env.FRONTEND_URL || 'http://localhost:3000',
     advanced: {

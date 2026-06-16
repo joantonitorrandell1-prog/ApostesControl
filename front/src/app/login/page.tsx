@@ -1,12 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { authClient } from '@/lib/auth-client';
 import { Trophy, Mail, Lock, AlertTriangle, Eye, EyeOff, CheckCircle } from 'lucide-react';
 
 export default function LoginPage() {
-  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -46,7 +44,6 @@ export default function LoginPage() {
         if (result.data?.token) {
           localStorage.setItem('auth_token', result.data.token);
         }
-        router.refresh();
         window.location.href = '/dashboard';
       }
     } catch (err: any) {
