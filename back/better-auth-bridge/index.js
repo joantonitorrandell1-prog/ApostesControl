@@ -10,6 +10,8 @@ async function getAuth(db, schema) {
   }
   if (authInstance) return authInstance;
 
+  const isProd = process.env.NODE_ENV === 'production';
+
   const [{ betterAuth }, { drizzleAdapter }] = await Promise.all([
     import('better-auth'),
     import('better-auth/adapters/drizzle'),
@@ -31,8 +33,12 @@ async function getAuth(db, schema) {
       disableCSRFCheck: true,
       trustedOrigins: [
         'https://apostes-control-front.vercel.app',
-        'http://localhost:3000',
-      ],
+        process.env.FRONTEND_URL,
+      ].filter(Boolean),
+      cookieOptions: {
+        sameSite: isProd ? 'none' : 'lax',
+        secure: isProd,
+      },
     },
     emailAndPassword: {
       enabled: true,
