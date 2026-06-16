@@ -37,6 +37,10 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
+app.get('/', (req, res) => {
+  res.json({ message: 'Bet Control API', docs: '/api/test' });
+});
+
 app.get('/api/test', (req, res) => {
   res.json({ hola: 'el backend funciona' });
 });
