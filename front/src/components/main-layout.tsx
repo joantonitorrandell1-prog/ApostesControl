@@ -29,7 +29,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
         } 
         // Logged in normally -> Prevent login or reset password page access
         else if (!user.requirePasswordChange && (isAuthPage || isResetPage)) {
-          router.push('/dashboard');
+          window.location.href = '/dashboard';;
         }
       }
     }

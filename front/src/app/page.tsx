@@ -11,7 +11,7 @@ export default function Home() {
   useEffect(() => {
     if (!isPending) {
       if (session) {
-        router.push('/dashboard');
+        window.location.href = '/dashboard';;
       } else {
         router.push('/login');
       }

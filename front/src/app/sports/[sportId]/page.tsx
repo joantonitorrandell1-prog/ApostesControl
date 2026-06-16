@@ -49,7 +49,7 @@ export default function SportPage({ params }: { params: { sportId: string } }) {
       setStats(statsData);
     } catch (err) {
       console.error('Failed to load sport detail data', err);
-      router.push('/dashboard');
+      window.location.href = '/dashboard';
     } finally {
       setLoading(false);
     }
@@ -90,7 +90,7 @@ export default function SportPage({ params }: { params: { sportId: string } }) {
 
     try {
       await apiClient(`/api/sports/${sportId}`, { method: 'DELETE' });
-      router.push('/dashboard');
+      window.location.href = '/dashboard';
     } catch (err) {
       alert('Error eliminant l\'esport');
     }
