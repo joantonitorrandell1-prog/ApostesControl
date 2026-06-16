@@ -19,18 +19,20 @@ import { requireAuth, requireAdmin } from './infrastructure/adapters/http/middle
 export const app = express();
 
 const allowedOrigins = [
+  'https://apostes-control-front.vercel.app',
   process.env.FRONTEND_URL,
   'http://localhost:3000',
 ].filter(Boolean) as string[];
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.warn(`CORS blocked origin: ${origin}`);
-      callback(null, false);
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    if (origin.endsWith('.vercel.app') && origin.includes('apostes-control-front')) {
+      return callback(null, true);
     }
+    console.warn(`CORS blocked origin: ${origin}`);
+    callback(null, false);
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
