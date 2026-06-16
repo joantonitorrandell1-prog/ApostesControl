@@ -40,16 +40,40 @@ export default function SportPage({ params }: { params: { sportId: string } }) {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const sportData = await apiClient<SportDTO>(`/api/sports/${sportId}`);
-      const compsData = await apiClient<CompetitionDTO[]>(`/api/competitions?sportId=${sportId}`);
-      const statsData = await apiClient<DashboardSummary>(`/api/stats?filter=${filter}&sportId=${sportId}`);
-      
+
+      // Crida 1: Sport detail
+      let sportData;
+      try {
+        sportData = await apiClient<SportDTO>(`/api/sports/${sportId}`);
+      } catch (err) {
+        console.error('❌ Error a la crida de l\'esport individual:', err);
+        throw new Error('FAILED_SPORT_CALL');
+      }
+
+      // Crida 2: Competitions
+      let compsData;
+      try {
+        compsData = await apiClient<CompetitionDTO[]>(`/api/competitions?sportId=${sportId}`);
+      } catch (err) {
+        console.error('❌ Error a la crida de competicions:', err);
+        throw new Error('FAILED_COMPETITIONS_CALL');
+      }
+
+      // Crida 3: Stats
+      let statsData;
+      try {
+        statsData = await apiClient<DashboardSummary>(`/api/stats?filter=${filter}&sportId=${sportId}`);
+      } catch (err) {
+        console.error('❌ Error a la crida d\'estadístiques:', err);
+        throw new Error('FAILED_STATS_CALL');
+      }
+
       setSport(sportData);
       setCompetitions(compsData);
       setStats(statsData);
-    } catch (err) {
-      console.error('Failed to load sport detail data', err);
-      window.location.href = '/dashboard';
+    } catch (err: any) {
+      console.error('🚨 Procés global fallit. Motiu de la redirecció:', err.message || err);
+      // window.location.href = '/dashboard'; // Comentat temporalment per diagnòstic
     } finally {
       setLoading(false);
     }
