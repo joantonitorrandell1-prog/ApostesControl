@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { authClient } from '@/lib/auth-client';
+import { signOut } from '@/lib/auth-client';
 import { apiClient } from '@/lib/api-client';
 import { Trophy, Lock, AlertTriangle, ShieldCheck } from 'lucide-react';
 
@@ -42,9 +42,7 @@ export default function ResetPasswordPage() {
       });
 
       // Session needs to be re-authenticated to clear cookies and get a fresh token. Sign out first.
-      await authClient.signOut();
-      
-      // Redirect to login with success indicator
+      localStorage.removeItem('auth_token');
       router.push('/login?resetSuccess=true');
     } catch (err: any) {
       setError(err.message || 'No s\'ha pogut canviar la contrasenya.');

@@ -2,14 +2,14 @@
 
 import React, { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { authClient } from '@/lib/auth-client';
+import { useSession, signOut } from '@/lib/auth-client';
 import { LogOut, LayoutDashboard, Shield, Trophy } from 'lucide-react';
 import Link from 'next/link';
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: session, isPending } = authClient.useSession();
+  const { data: session, isPending } = useSession();
 
   const isAuthPage = pathname === '/login';
   const isResetPage = pathname === '/reset-password';
@@ -60,8 +60,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
   const user = session.user as any;
 
   const handleLogout = async () => {
-    await authClient.signOut();
-    router.push('/login');
+    await signOut();
   };
 
   return (

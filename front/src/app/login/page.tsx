@@ -35,14 +35,17 @@ export default function LoginPage() {
     setSuccessMsg(null);
 
     try {
-      const { error: signInError } = await authClient.signIn.email({
+      const result = await authClient.signIn.email({
         email,
         password,
       });
 
-      if (signInError) {
-        setError(signInError.message || 'Error de credencials.');
+      if (result.error) {
+        setError(result.error.message || 'Error de credencials.');
       } else {
+        if (result.data?.token) {
+          localStorage.setItem('auth_token', result.data.token);
+        }
         router.refresh();
         window.location.href = '/dashboard';
       }
