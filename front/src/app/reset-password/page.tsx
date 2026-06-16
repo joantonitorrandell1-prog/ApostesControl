@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { signOut } from '@/lib/auth-client';
 import { apiClient } from '@/lib/api-client';
 import { Trophy, Lock, AlertTriangle, ShieldCheck } from 'lucide-react';
 
