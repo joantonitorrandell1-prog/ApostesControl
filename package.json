@@ -3,8 +3,5 @@
   "workspaces": [
     "front",
     "back"
-  ],
-  "scripts": {
-    "vercel-build": "npm run build --workspace=front"
-  }
+  ]
 }
