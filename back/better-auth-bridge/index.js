@@ -28,6 +28,7 @@ async function getAuth(db, schema) {
     secret: process.env.BETTER_AUTH_SECRET || 'supersecretbetterauthkey123456789012345',
     baseURL: process.env.BETTER_AUTH_URL || process.env.FRONTEND_URL || 'http://localhost:3000',
     trustedOrigins: [
+      'https://apostes-control-front.vercel.app',
       process.env.FRONTEND_URL,
       'http://localhost:3000',
     ].filter(Boolean),
