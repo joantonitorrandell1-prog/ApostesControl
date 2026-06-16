@@ -1,4 +1,1 @@
-{
-  "buildCommand": "npm run build --workspace=front",
-  "installCommand": "npm install"
-}
+{}
