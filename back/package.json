@@ -9,7 +9,6 @@
     "build": "tsc",
     "start": "node dist/src/main.js",
     "seed": "tsx scripts/seed.ts",
-    "vercel-build": "NODE_ENV=development tsc",
     "clean": "rm -rf dist",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
