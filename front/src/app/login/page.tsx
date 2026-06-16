@@ -43,7 +43,8 @@ export default function LoginPage() {
       if (signInError) {
         setError(signInError.message || 'Error de credencials.');
       } else {
-        router.refresh(); // Triggers the layout check to redirect appropriately
+        router.refresh();
+        router.push('/dashboard');
       }
     } catch (err: any) {
       setError('No s\'ha pogut connectar amb el servidor.');
