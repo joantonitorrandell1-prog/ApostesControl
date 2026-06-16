@@ -1,9 +1,9 @@
-import { BetRepositoryPort } from '../../domain/ports/bet-repository.port';
-import { SportRepositoryPort } from '../../domain/ports/sport-repository.port';
-import { CompetitionRepositoryPort } from '../../domain/ports/competition-repository.port';
-import { SportEntity } from '../../domain/entities/sport.entity';
-import { CompetitionEntity } from '../../domain/entities/competition.entity';
-import { BetEntity } from '../../domain/entities/bet.entity';
+import { BetRepositoryPort } from '../../domain/ports/bet-repository.port.js';
+import { SportRepositoryPort } from '../../domain/ports/sport-repository.port.js';
+import { CompetitionRepositoryPort } from '../../domain/ports/competition-repository.port.js';
+import { SportEntity } from '../../domain/entities/sport.entity.js';
+import { CompetitionEntity } from '../../domain/entities/competition.entity.js';
+import { BetEntity } from '../../domain/entities/bet.entity.js';
 import {
   CreateSportRequest,
   CreateCompetitionRequest,
@@ -14,7 +14,7 @@ import {
   DashboardSummary,
   DashboardStatsPeriod,
   BetStatus
-} from '../../@types/contract';
+} from '../../@types/contract.js';
 
 export class BetManagementUseCase {
   constructor(

@@ -1,7 +1,7 @@
-import { SportRepositoryPort } from '../../../../../domain/ports/sport-repository.port';
-import { SportEntity } from '../../../../../domain/entities/sport.entity';
-import { db } from '../connection';
-import { sport as sportTable } from '../schema';
+import { SportRepositoryPort } from '../../../../../domain/ports/sport-repository.port.js';
+import { SportEntity } from '../../../../../domain/entities/sport.entity.js';
+import { db } from '../connection.js';
+import { sport as sportTable } from '../schema.js';
 import { eq } from 'drizzle-orm';
 
 export class DrizzleSportRepository implements SportRepositoryPort {

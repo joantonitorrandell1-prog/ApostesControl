@@ -1,8 +1,8 @@
-import { UserRepositoryPort } from '../../domain/ports/user-repository.port';
-import { EmailServicePort } from '../../domain/ports/email-service.port';
-import { UserEntity } from '../../domain/entities/user.entity';
-import { CreateUserRequest, CreateUserResponse } from '../../@types/contract';
-import { hashPassword } from '../utils/password-hash';
+import { UserRepositoryPort } from '../../domain/ports/user-repository.port.js';
+import { EmailServicePort } from '../../domain/ports/email-service.port.js';
+import { UserEntity } from '../../domain/entities/user.entity.js';
+import { CreateUserRequest, CreateUserResponse } from '../../@types/contract.js';
+import { hashPassword } from '../utils/password-hash.js';
 
 export class CreateUserUseCase {
   constructor(

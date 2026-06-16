@@ -15,8 +15,8 @@ export interface AuthenticatedRequest extends Request {
 
 export async function requireAuth(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   try {
-    const { db } = await import('../../db/drizzle/connection');
-    const schema = await import('../../db/drizzle/schema');
+    const { db } = await import('../../db/drizzle/connection.js');
+    const schema = await import('../../db/drizzle/schema.js');
     const auth = await getAuth(db, schema);
     const session = await auth.api.getSession({
       headers: new Headers(req.headers as any),

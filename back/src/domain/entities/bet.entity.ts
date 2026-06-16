@@ -1,4 +1,4 @@
-import { BetStatus } from '../../@types/contract';
+import { BetStatus } from '../../@types/contract.js';
 
 export class BetEntity {
   constructor(

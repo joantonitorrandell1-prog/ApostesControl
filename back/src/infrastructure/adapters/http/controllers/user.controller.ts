@@ -1,8 +1,8 @@
 import { Response } from 'express';
-import { AuthenticatedRequest } from '../middlewares/auth.middleware';
-import { CreateUserUseCase } from '../../../../application/use-cases/create-user.use-case';
-import { ChangePasswordUseCase } from '../../../../application/use-cases/change-password.use-case';
-import { UserRepositoryPort } from '../../../../domain/ports/user-repository.port';
+import { AuthenticatedRequest } from '../middlewares/auth.middleware.js';
+import { CreateUserUseCase } from '../../../../application/use-cases/create-user.use-case.js';
+import { ChangePasswordUseCase } from '../../../../application/use-cases/change-password.use-case.js';
+import { UserRepositoryPort } from '../../../../domain/ports/user-repository.port.js';
 
 export class UserController {
   constructor(

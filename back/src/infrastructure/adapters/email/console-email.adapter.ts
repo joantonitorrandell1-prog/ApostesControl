@@ -1,4 +1,4 @@
-import { EmailServicePort } from '../../../domain/ports/email-service.port';
+import { EmailServicePort } from '../../../domain/ports/email-service.port.js';
 
 export class ConsoleEmailAdapter implements EmailServicePort {
   public async sendUserInvitation(email: string, name: string, temporaryPassword: string): Promise<void> {

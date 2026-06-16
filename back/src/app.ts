@@ -2,19 +2,19 @@ import express from 'express';
 import cors from 'cors';
 
 import { getAuth, getToNodeHandler } from 'better-auth-bridge';
-import { DrizzleUserRepository } from './infrastructure/adapters/db/drizzle/repositories/drizzle-user-repo';
-import { DrizzleSportRepository } from './infrastructure/adapters/db/drizzle/repositories/drizzle-sport-repo';
-import { DrizzleCompetitionRepository } from './infrastructure/adapters/db/drizzle/repositories/drizzle-competition-repo';
-import { DrizzleBetRepository } from './infrastructure/adapters/db/drizzle/repositories/drizzle-bet-repo';
-import { SmtpEmailAdapter } from './infrastructure/adapters/email/smtp-email.adapter';
+import { DrizzleUserRepository } from './infrastructure/adapters/db/drizzle/repositories/drizzle-user-repo.js';
+import { DrizzleSportRepository } from './infrastructure/adapters/db/drizzle/repositories/drizzle-sport-repo.js';
+import { DrizzleCompetitionRepository } from './infrastructure/adapters/db/drizzle/repositories/drizzle-competition-repo.js';
+import { DrizzleBetRepository } from './infrastructure/adapters/db/drizzle/repositories/drizzle-bet-repo.js';
+import { SmtpEmailAdapter } from './infrastructure/adapters/email/smtp-email.adapter.js';
 
-import { CreateUserUseCase } from './application/use-cases/create-user.use-case';
-import { ChangePasswordUseCase } from './application/use-cases/change-password.use-case';
-import { BetManagementUseCase } from './application/use-cases/bet-management.use-case';
+import { CreateUserUseCase } from './application/use-cases/create-user.use-case.js';
+import { ChangePasswordUseCase } from './application/use-cases/change-password.use-case.js';
+import { BetManagementUseCase } from './application/use-cases/bet-management.use-case.js';
 
-import { UserController } from './infrastructure/adapters/http/controllers/user.controller';
-import { BetController } from './infrastructure/adapters/http/controllers/bet.controller';
-import { requireAuth, requireAdmin } from './infrastructure/adapters/http/middlewares/auth.middleware';
+import { UserController } from './infrastructure/adapters/http/controllers/user.controller.js';
+import { BetController } from './infrastructure/adapters/http/controllers/bet.controller.js';
+import { requireAuth, requireAdmin } from './infrastructure/adapters/http/middlewares/auth.middleware.js';
 
 export const app = express();
 
@@ -47,8 +47,8 @@ app.get('/api/test', (req, res) => {
 
 app.all('/api/auth/*', async (req, res, next) => {
   try {
-    const { db } = await import('./infrastructure/adapters/db/drizzle/connection');
-    const schema = await import('./infrastructure/adapters/db/drizzle/schema');
+    const { db } = await import('./infrastructure/adapters/db/drizzle/connection.js');
+    const schema = await import('./infrastructure/adapters/db/drizzle/schema.js');
     const auth = await getAuth(db, schema);
     const toNodeHandler = await getToNodeHandler();
     const handler = toNodeHandler(auth);

@@ -1,4 +1,4 @@
-import { UserRole } from '../../@types/contract';
+import { UserRole } from '../../@types/contract.js';
 
 export class UserEntity {
   constructor(

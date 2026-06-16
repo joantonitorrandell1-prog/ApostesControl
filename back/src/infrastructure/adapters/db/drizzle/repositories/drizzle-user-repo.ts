@@ -1,7 +1,7 @@
-import { UserRepositoryPort } from '../../../../../domain/ports/user-repository.port';
-import { UserEntity } from '../../../../../domain/entities/user.entity';
-import { db } from '../connection';
-import { user as userTable, account as accountTable } from '../schema';
+import { UserRepositoryPort } from '../../../../../domain/ports/user-repository.port.js';
+import { UserEntity } from '../../../../../domain/entities/user.entity.js';
+import { db } from '../connection.js';
+import { user as userTable, account as accountTable } from '../schema.js';
 import { eq } from 'drizzle-orm';
 
 export class DrizzleUserRepository implements UserRepositoryPort {

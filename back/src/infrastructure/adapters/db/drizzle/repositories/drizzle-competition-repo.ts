@@ -1,7 +1,7 @@
-import { CompetitionRepositoryPort } from '../../../../../domain/ports/competition-repository.port';
-import { CompetitionEntity } from '../../../../../domain/entities/competition.entity';
-import { db } from '../connection';
-import { competition as competitionTable } from '../schema';
+import { CompetitionRepositoryPort } from '../../../../../domain/ports/competition-repository.port.js';
+import { CompetitionEntity } from '../../../../../domain/entities/competition.entity.js';
+import { db } from '../connection.js';
+import { competition as competitionTable } from '../schema.js';
 import { eq } from 'drizzle-orm';
 
 export class DrizzleCompetitionRepository implements CompetitionRepositoryPort {

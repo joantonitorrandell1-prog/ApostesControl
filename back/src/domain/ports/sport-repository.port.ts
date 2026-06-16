@@ -1,4 +1,4 @@
-import { SportEntity } from '../entities/sport.entity';
+import { SportEntity } from '../entities/sport.entity.js';
 
 export interface SportRepositoryPort {
   findById(id: string): Promise<SportEntity | null>;

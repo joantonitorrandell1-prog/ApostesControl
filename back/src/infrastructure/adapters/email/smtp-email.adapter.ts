@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import { EmailServicePort } from '../../../domain/ports/email-service.port';
+import { EmailServicePort } from '../../../domain/ports/email-service.port.js';
 
 export class SmtpEmailAdapter implements EmailServicePort {
   private transporter: nodemailer.Transporter;

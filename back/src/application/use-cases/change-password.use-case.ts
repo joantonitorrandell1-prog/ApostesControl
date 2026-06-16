@@ -1,5 +1,5 @@
-import { UserRepositoryPort } from '../../domain/ports/user-repository.port';
-import { hashPassword } from '../utils/password-hash';
+import { UserRepositoryPort } from '../../domain/ports/user-repository.port.js';
+import { hashPassword } from '../utils/password-hash.js';
 
 export class ChangePasswordUseCase {
   constructor(private readonly userRepository: UserRepositoryPort) {}

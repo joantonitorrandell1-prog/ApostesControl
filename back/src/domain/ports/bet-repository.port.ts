@@ -1,4 +1,4 @@
-import { BetEntity } from '../entities/bet.entity';
+import { BetEntity } from '../entities/bet.entity.js';
 
 export interface BetRepositoryPort {
   findById(id: string): Promise<BetEntity | null>;

@@ -1,10 +1,10 @@
 import express from 'express';
 import dotenv from 'dotenv';
 
-import { db } from './infrastructure/adapters/db/drizzle/connection';
-import { user as userTable, account as accountTable } from './infrastructure/adapters/db/drizzle/schema';
-import { app } from './app';
-import { hashPassword } from './application/utils/password-hash';
+import { db } from './infrastructure/adapters/db/drizzle/connection.js';
+import { user as userTable, account as accountTable } from './infrastructure/adapters/db/drizzle/schema.js';
+import { app } from './app.js';
+import { hashPassword } from './application/utils/password-hash.js';
 
 dotenv.config();
 

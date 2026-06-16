@@ -1,4 +1,4 @@
-import { CompetitionEntity } from '../entities/competition.entity';
+import { CompetitionEntity } from '../entities/competition.entity.js';
 
 export interface CompetitionRepositoryPort {
   findById(id: string): Promise<CompetitionEntity | null>;

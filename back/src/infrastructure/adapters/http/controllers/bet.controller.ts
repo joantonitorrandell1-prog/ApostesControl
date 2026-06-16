@@ -1,6 +1,6 @@
 import { Response } from 'express';
-import { AuthenticatedRequest } from '../middlewares/auth.middleware';
-import { BetManagementUseCase } from '../../../../application/use-cases/bet-management.use-case';
+import { AuthenticatedRequest } from '../middlewares/auth.middleware.js';
+import { BetManagementUseCase } from '../../../../application/use-cases/bet-management.use-case.js';
 
 export class BetController {
   constructor(private readonly betUseCase: BetManagementUseCase) {}

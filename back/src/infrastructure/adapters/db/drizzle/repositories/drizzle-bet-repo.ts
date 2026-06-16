@@ -1,7 +1,7 @@
-import { BetRepositoryPort } from '../../../../../domain/ports/bet-repository.port';
-import { BetEntity } from '../../../../../domain/entities/bet.entity';
-import { db } from '../connection';
-import { bet as betTable, competition as competitionTable, sport as sportTable } from '../schema';
+import { BetRepositoryPort } from '../../../../../domain/ports/bet-repository.port.js';
+import { BetEntity } from '../../../../../domain/entities/bet.entity.js';
+import { db } from '../connection.js';
+import { bet as betTable, competition as competitionTable, sport as sportTable } from '../schema.js';
 import { eq } from 'drizzle-orm';
 
 export class DrizzleBetRepository implements BetRepositoryPort {
