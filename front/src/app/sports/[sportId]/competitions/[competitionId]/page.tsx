@@ -4,9 +4,9 @@ import React, { useState, useEffect, use } from 'react';
 import { apiClient } from '@/lib/api-client';
 import { SportDTO, CompetitionDTO, BetDTO, BetStatus } from '@/@types/contract';
 import { 
-  Trophy, Plus, Trash2, Calendar, Link as LinkIcon, Edit2, Check,
-  HelpCircle, CheckCircle, XCircle, AlertCircle, Percent,
-  Coins, Sparkles, BookOpen, Star, ShieldAlert, ArrowLeft, Ban, DollarSign
+  Plus, Trash2, Calendar, Edit2, Check, HelpCircle, 
+  CheckCircle, XCircle, Percent, Coins, Sparkles, BookOpen, 
+  Star, ArrowLeft, Ban, DollarSign, Trophy
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -24,6 +24,8 @@ export default function CompetitionPage({
   const [bets, setBets] = useState<BetDTO[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Estats del formulari d'alta
+  const [matchName, setMatchName] = useState('');
   const [pick, setPick] = useState('');
   const [bookmaker, setBookmaker] = useState('');
   const [amount, setAmount] = useState('');
@@ -31,17 +33,19 @@ export default function CompetitionPage({
   const [stake, setStake] = useState('1');
   const [betType, setBetType] = useState<'SIMPLE' | 'COMBINADA'>('SIMPLE');
   const [isBonusCredit, setIsBonusCredit] = useState(false);
-  const [status, setStatus] = useState<BetStatus | 'VOID' | 'CASH_OUT'>('PENDING');
+  const [status, setStatus] = useState<string>('PENDING');
   const [cashOutAmount, setCashOutAmount] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   
   const [actionLoading, setActionLoading] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
 
+  // Estats per a l'edició inline
   const [editingBetId, setEditingBetId] = useState<string | null>(null);
   const [editAmount, setEditAmount] = useState('');
   const [editOdds, setEditOdds] = useState('');
   const [editPick, setEditPick] = useState('');
+  const [editMatch, setEditMatch] = useState('');
 
   const fetchData = async () => {
     try {
@@ -72,8 +76,12 @@ export default function CompetitionPage({
     const parsedStake = parseFloat(stake);
     const parsedCashOut = parseFloat(cashOutAmount);
 
+    if (!matchName.trim()) {
+      alert('Si us plau, especifica el Partit / Esdeveniment.');
+      return;
+    }
     if (!pick.trim()) {
-      alert('Si us plau, especifica quina selecció o Pronòstic fas.');
+      alert('Si us plau, especifica el Pronòstic (Pick).');
       return;
     }
     if (isNaN(parsedAmount) || isNaN(parsedOdds) || parsedAmount <= 0 || parsedOdds <= 1) {
@@ -87,6 +95,7 @@ export default function CompetitionPage({
         method: 'POST',
         body: JSON.stringify({
           competitionId,
+          matchName,
           pick,
           bookmaker: bookmaker || 'Desconeguda',
           amount: parsedAmount,
@@ -102,6 +111,7 @@ export default function CompetitionPage({
       });
 
       setBets([created, ...bets]);
+      setMatchName('');
       setPick('');
       setBookmaker('');
       setAmount('');
@@ -145,6 +155,7 @@ export default function CompetitionPage({
     setEditAmount(bet.amount.toString());
     setEditOdds(bet.odds.toString());
     setEditPick((bet as any).pick || '');
+    setEditMatch((bet as any).matchName || '');
   };
 
   const saveInlineEdit = async (betId: string) => {
@@ -162,7 +173,8 @@ export default function CompetitionPage({
         body: JSON.stringify({
           amount: parsedAmount,
           odds: parsedOdds,
-          pick: editPick
+          pick: editPick,
+          matchName: editMatch
         }),
       });
       setBets(bets.map(b => b.id === betId ? updated : b));
@@ -196,7 +208,7 @@ export default function CompetitionPage({
             <span>{competition?.name}</span>
             <span className="text-slate-500 font-normal">/ Registre</span>
           </h1>
-          <p className="text-slate-400 mt-1">Full d'anàlisi de apostes amb stakeholders, tipologies i rendibilitat.</p>
+          <p className="text-slate-400 mt-1">Full d'anàlisi d'apostes esportives.</p>
         </div>
 
         <button
@@ -212,19 +224,19 @@ export default function CompetitionPage({
         <form onSubmit={handleCreateBet} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 space-y-4">
           <h2 className="text-lg font-bold text-white flex items-center gap-2">
             <Plus className="w-5 h-5 text-accent-green" />
-            <span>Especificacions del Pick / Inversió</span>
+            <span>Especificacions de la Inversió</span>
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Pronòstic / Pick / Selecció</label>
+              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Partit / Esdeveniment</label>
               <div className="relative">
-                <BookOpen className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                <Trophy className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                 <input
                   type="text"
-                  value={pick}
-                  onChange={(e) => setPick(e.target.value)}
-                  placeholder="Ex: Real Madrid -1.5 Handicap"
+                  value={matchName}
+                  onChange={(e) => setMatchName(e.target.value)}
+                  placeholder="Ex: Barcelona vs Real Madrid"
                   className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:border-accent-green focus:outline-none text-white text-sm"
                   required
                 />
@@ -232,35 +244,50 @@ export default function CompetitionPage({
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Casa d'apostes (Bookie)</label>
+              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Pronòstic / Pick</label>
+              <div className="relative">
+                <BookOpen className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                <input
+                  type="text"
+                  value={pick}
+                  onChange={(e) => setPick(e.target.value)}
+                  placeholder="Ex: Barcelona guanya"
+                  className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:border-accent-green focus:outline-none text-white text-sm"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Casa d'apostes</label>
               <div className="relative">
                 <Star className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                 <input
                   type="text"
                   value={bookmaker}
                   onChange={(e) => setBookmaker(e.target.value)}
-                  placeholder="Ex: Bet365, Winamax, Betfair"
+                  placeholder="Ex: Bet365"
                   className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:border-accent-green focus:outline-none text-white text-sm"
                 />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Tipus d'Aposta</label>
+              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Tipus</label>
               <select
                 value={betType}
                 onChange={(e) => setBetType(e.target.value as any)}
                 className="w-full px-4 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:border-accent-green focus:outline-none text-white text-sm"
               >
-                <option value="SIMPLE">Aposta Simple</option>
-                <option value="COMBINADA">Aposta Combinada</option>
+                <option value="SIMPLE">Simple</option>
+                <option value="COMBINADA">Combinada</option>
               </select>
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Import Cost (€)</label>
+              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Import (€)</label>
               <div className="relative">
                 <Coins className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                 <input
@@ -276,7 +303,7 @@ export default function CompetitionPage({
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Quota decimal</label>
+              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Quota</label>
               <div className="relative">
                 <Percent className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                 <input
@@ -292,7 +319,7 @@ export default function CompetitionPage({
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Stake (Confiança 1-10)</label>
+              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Stake</label>
               <select
                 value={stake}
                 onChange={(e) => setStake(e.target.value)}
@@ -308,7 +335,7 @@ export default function CompetitionPage({
               <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Estat Inversió</label>
               <select
                 value={status}
-                onChange={(e) => setStatus(e.target.value as any)}
+                onChange={(e) => setStatus(e.target.value)}
                 className="w-full px-4 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:border-accent-green focus:outline-none text-white text-sm"
               >
                 <option value="PENDING">PENDENT</option>
@@ -341,13 +368,13 @@ export default function CompetitionPage({
                   className="w-4 h-4 accent-accent-green border-slate-800 rounded cursor-pointer"
                 />
                 <span className="flex items-center gap-1">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Utilitza crèdit de Bo / Freebet
+                  <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Utilitza Freebet / Bo
                 </span>
               </label>
 
               {status === 'CASH_OUT' && (
                 <div className="flex items-center gap-2 animate-fadeIn">
-                  <label className="text-xs font-semibold text-slate-400 uppercase">Import rebut Cashout (€)</label>
+                  <label className="text-xs font-semibold text-slate-400 uppercase">Import Cashout (€)</label>
                   <input
                     type="number"
                     step="0.01"
@@ -396,7 +423,7 @@ export default function CompetitionPage({
               <thead className="bg-slate-950/40 text-[10px] uppercase font-bold text-slate-400 tracking-wider border-b border-slate-800">
                 <tr>
                   <th className="px-6 py-3.5">Data i Bookie</th>
-                  <th className="px-6 py-3.5">Tipus / Pick</th>
+                  <th className="px-6 py-3.5">Partit i Pronòstic</th>
                   <th className="px-6 py-3.5">Import</th>
                   <th className="px-6 py-3.5">Quota</th>
                   <th className="px-6 py-3.5">Stake</th>
@@ -408,37 +435,7 @@ export default function CompetitionPage({
               <tbody className="divide-y divide-slate-800/60">
                 {bets.map((b) => {
                   const isEditing = editingBetId === b.id;
-                  
-                  let badge = (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-medium bg-slate-800 text-slate-400 border border-slate-700">
-                      <HelpCircle className="w-3.5 h-3.5" /> Pendent
-                    </span>
-                  );
-                  if (b.status === 'WON') {
-                    badge = (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-emerald-500/10 text-accent-green border border-emerald-500/20">
-                        <CheckCircle className="w-3.5 h-3.5" /> Encertada
-                      </span>
-                    );
-                  } else if (b.status === 'LOST') {
-                    badge = (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">
-                        <XCircle className="w-3.5 h-3.5" /> Fallada
-                      </span>
-                    );
-                  } else if ((b as any).status === 'VOID') {
-                    badge = (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-medium bg-slate-800 text-slate-400 border border-slate-700">
-                        <Ban className="w-3.5 h-3.5" /> Nul·la
-                      </span>
-                    );
-                  } else if ((b as any).status === 'CASH_OUT') {
-                    badge = (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-amber-500/10 text-amber-500 border border-amber-500/20">
-                        <DollarSign className="w-3.5 h-3.5" /> Cash Out
-                      </span>
-                    );
-                  }
+                  const currentStatus = b.status as string;
 
                   return (
                     <tr key={b.id} className="hover:bg-slate-900/10 transition align-middle">
@@ -447,17 +444,28 @@ export default function CompetitionPage({
                         <div className="text-xs font-bold text-slate-500 uppercase tracking-tight">{(b as any).bookmaker || 'Bet365'}</div>
                       </td>
 
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-4 border-slate-800">
                         {isEditing ? (
-                          <input
-                            type="text"
-                            value={editPick}
-                            onChange={(e) => setEditPick(e.target.value)}
-                            className="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs text-white w-full"
-                          />
+                          <div className="space-y-1">
+                            <input
+                              type="text"
+                              value={editMatch}
+                              onChange={(e) => setEditMatch(e.target.value)}
+                              className="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs text-white w-full"
+                              placeholder="Partit"
+                            />
+                            <input
+                              type="text"
+                              value={editPick}
+                              onChange={(e) => setEditPick(e.target.value)}
+                              className="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs text-slate-300 w-full"
+                              placeholder="Pronòstic"
+                            />
+                          </div>
                         ) : (
                           <>
-                            <div className="font-semibold text-white text-sm">{(b as any).pick || 'Sense descripció'}</div>
+                            <div className="font-bold text-slate-400 text-xs">{(b as any).matchName || 'Partit general'}</div>
+                            <div className="font-semibold text-white text-sm">{(b as any).pick || 'Sense pronòstic'}</div>
                             <div className="text-[10px] text-slate-500 font-bold">{(b as any).type || 'SIMPLE'} {b.isBonusCredit && '• (Bo)'}</div>
                           </>
                         )}
@@ -496,35 +504,32 @@ export default function CompetitionPage({
                       </td>
 
                       <td className="px-6 py-4">
-                        <div className="flex flex-col gap-1.5 items-start">
-                          {badge}
-                          {b.status === 'PENDING' && !isEditing && (
-                            <div className="flex gap-1 animate-fadeIn">
-                              <button
-                                onClick={() => handleUpdateStatus(b.id, 'WON')}
-                                className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 hover:border-accent-green hover:text-accent-green text-[10px] font-bold"
-                              >
-                                Guanyat
-                              </button>
-                              <button
-                                onClick={() => handleUpdateStatus(b.id, 'LOST')}
-                                className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 hover:border-rose-500 hover:text-rose-500 text-[10px] font-bold"
-                              >
-                                Perdut
-                              </button>
-                            </div>
-                          )}
-                        </div>
+                        <select
+                          value={currentStatus}
+                          onChange={(e) => handleUpdateStatus(b.id, e.target.value)}
+                          className={`text-xs font-semibold px-2.5 py-1 rounded-md border bg-slate-950 cursor-pointer focus:outline-none transition ${
+                            currentStatus === 'WON' ? 'text-accent-green border-emerald-500/30' :
+                            currentStatus === 'LOST' ? 'text-rose-400 border-rose-500/30' :
+                            currentStatus === 'VOID' ? 'text-slate-400 border-slate-700' :
+                            'text-amber-500 border-amber-500/30'
+                          }`}
+                        >
+                          <option value="PENDING">PENDENT</option>
+                          <option value="WON">GUANYADA</option>
+                          <option value="LOST">PERDUDA</option>
+                          <option value="VOID">VOID / NUL·LA</option>
+                          <option value="CASH_OUT">CASH OUT</option>
+                        </select>
                       </td>
 
                       <td className="px-6 py-4 font-bold">
-                        {b.status === 'WON' ? (
+                        {currentStatus === 'WON' ? (
                           <span className="text-accent-green">+{b.earnings.toFixed(2)} €</span>
-                        ) : b.status === 'LOST' ? (
+                        ) : currentStatus === 'LOST' ? (
                           <span className="text-rose-500">-{b.amount.toFixed(2)} €</span>
-                        ) : (b as any).status === 'VOID' ? (
-                          <span className="text-slate-400">0.00 € (Nul·la)</span>
-                        ) : (b as any).status === 'CASH_OUT' ? (
+                        ) : currentStatus === 'VOID' ? (
+                          <span className="text-slate-400">0.00 €</span>
+                        ) : currentStatus === 'CASH_OUT' ? (
                           <span className={((b as any).cashOutAmount - b.amount) >= 0 ? 'text-accent-green' : 'text-rose-500'}>
                             {((b as any).cashOutAmount || 0).toFixed(2)} €
                           </span>
@@ -538,7 +543,7 @@ export default function CompetitionPage({
                           {isEditing ? (
                             <button
                               onClick={() => saveInlineEdit(b.id)}
-                              className="p-1.5 rounded-lg text-accent-green bg-emerald-500/10 border border-emerald-500/20 hover:bg-emerald-500/20"
+                              className="p-1.5 rounded-lg text-accent-green bg-emerald-500/10 border border-emerald-500/20"
                               title="Desar canvis"
                             >
                               <Check className="w-4 h-4" />
@@ -547,7 +552,7 @@ export default function CompetitionPage({
                             <button
                               onClick={() => startInlineEdit(b)}
                               className="p-1.5 rounded-lg text-slate-400 hover:text-white"
-                              title="Editar camps"
+                              title="Editar"
                             >
                               <Edit2 className="w-4 h-4" />
                             </button>
@@ -555,7 +560,7 @@ export default function CompetitionPage({
                           <button
                             onClick={() => handleDeleteBet(b.id)}
                             className="p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-950/20"
-                            title="Eliminar l'aposta"
+                            title="Eliminar"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
