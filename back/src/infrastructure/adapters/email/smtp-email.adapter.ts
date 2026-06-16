@@ -50,7 +50,7 @@ export class SmtpEmailAdapter implements EmailServicePort {
             </div>
           </div>
 
-          <a href="http://localhost:3000/login" style="display: block; text-align: center; background-color: #10b981; color: #0b1121; text-decoration: none; font-weight: 700; font-size: 14px; padding: 12px 24px; border-radius: 10px; margin: 20px 0;">
+          <a href="https://apostes-control-front.vercel.app/login" style="display: block; text-align: center; background-color: #10b981; color: #0b1121; text-decoration: none; font-weight: 700; font-size: 14px; padding: 12px 24px; border-radius: 10px; margin: 20px 0;">
             Iniciar sessió
           </a>
 
