@@ -5,6 +5,6 @@
     "back"
   ],
   "scripts": {
-    "vercel-build": "npm run build --workspace=front"
+    "vercel-build": "npm run build --workspace=front && npm run build --workspace=back"
   }
 }
