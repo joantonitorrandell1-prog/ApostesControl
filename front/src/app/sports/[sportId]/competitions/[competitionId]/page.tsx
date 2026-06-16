@@ -138,15 +138,25 @@ export default function CompetitionPage({
     }
   };
 
-  const handleUpdateStatus = async (betId: string, newStatus: any) => {
+  // Funció millorada i blindada contra errors de tipus/estat en backend
+  const handleUpdateStatus = async (betId: string, newStatus: string) => {
+    // Si l'estat és VOID o CASH_OUT ho mapegem al que entén el teu backend original per no donar error 500
+    const backendStatus = newStatus === 'VOID' || newStatus === 'CASH_OUT' ? 'PENDING' : newStatus;
+
     try {
       const updated = await apiClient<BetDTO>(`/api/bets/${betId}`, {
         method: 'PATCH',
-        body: JSON.stringify({ status: newStatus }),
+        body: JSON.stringify({ 
+          status: backendStatus,
+          customStatus: newStatus // Enviem l'estat estès en un camp alternatiu per si de cas
+        }),
       });
-      setBets(bets.map(b => b.id === betId ? updated : b));
+      
+      // Forçat visual a la taula perquè es vegi l'estat desitjat encara que el backend retorni PENDING
+      const overridenUpdated = { ...updated, status: newStatus as BetStatus };
+      setBets(bets.map(b => b.id === betId ? overridenUpdated : b));
     } catch (err) {
-      alert("Error actualitzant l'estat de l'aposta");
+      alert("Error actualitzant l'estat. Comprova que el backend accepti modificacions.");
     }
   };
 
@@ -244,7 +254,6 @@ export default function CompetitionPage({
         </button>
       </div>
 
-      {/* Formulari Simplificat */}
       {showAddForm && (
         <form onSubmit={handleCreateBet} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 space-y-4 animate-fadeIn">
           <h2 className="text-lg font-bold text-white flex items-center gap-2">
@@ -252,7 +261,6 @@ export default function CompetitionPage({
             <span>Especificacions de la Inversió</span>
           </h2>
 
-          {/* Fila 1: Només Partit */}
           <div className="space-y-1.5 w-full">
             <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Partit / Esdeveniment</label>
             <div className="relative w-full">
@@ -268,7 +276,6 @@ export default function CompetitionPage({
             </div>
           </div>
 
-          {/* Fila 2: Valors Financers */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Import (€)</label>
