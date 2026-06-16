@@ -39,6 +39,8 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
+app.use(express.json());
+
 app.get('/', (req, res) => {
   res.json({ message: 'Bet Control API', docs: '/api/test' });
 });
@@ -62,8 +64,6 @@ app.all('/api/auth/*', async (req, res, next) => {
     }
   }
 });
-
-app.use(express.json());
 
 export const userRepository = new DrizzleUserRepository();
 export const sportRepository = new DrizzleSportRepository();
