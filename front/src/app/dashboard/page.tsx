@@ -8,6 +8,7 @@ import {
   TrendingUp, Percent, Hourglass, Check, X, Calendar 
 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 // Lazy load Recharts to avoid SSR hydration mismatches
 import {
@@ -15,6 +16,7 @@ import {
 } from 'recharts';
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [sports, setSports] = useState<SportDTO[]>([]);
   const [stats, setStats] = useState<DashboardSummary | null>(null);
   const [filter, setFilter] = useState<'daily' | 'monthly' | 'yearly'>('daily');
@@ -63,6 +65,8 @@ export default function DashboardPage() {
       // Refresh statistics just in case
       const statsData = await apiClient<DashboardSummary>(`/api/stats?filter=${filter}`);
       setStats(statsData);
+
+      router.push(`/sports/${created.id}`);
     } catch (err) {
       alert('Error creant l\'esport');
     } finally {
