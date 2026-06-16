@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 
 import { getAuth, getToNodeHandler } from 'better-auth-bridge';
+import { db } from './infrastructure/adapters/db/drizzle/connection';
+import * as schema from './infrastructure/adapters/db/drizzle/schema';
 import { DrizzleUserRepository } from './infrastructure/adapters/db/drizzle/repositories/drizzle-user-repo';
 import { DrizzleSportRepository } from './infrastructure/adapters/db/drizzle/repositories/drizzle-sport-repo';
 import { DrizzleCompetitionRepository } from './infrastructure/adapters/db/drizzle/repositories/drizzle-competition-repo';
@@ -47,7 +49,7 @@ app.get('/api/test', (req, res) => {
 
 app.all('/api/auth/*', async (req, res, next) => {
   try {
-    const auth = await getAuth();
+    const auth = await getAuth(db, schema);
     const toNodeHandler = await getToNodeHandler();
     const handler = toNodeHandler(auth);
     await handler(req, res);

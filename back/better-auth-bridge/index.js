@@ -2,20 +2,12 @@
 // Lives in node_modules (via file: dependency), so esbuild does NOT bundle it.
 // Native import() calls are preserved at runtime.
 
-let db, schema;
 let authInstance = null;
-let initialized = false;
 
-function _requireDb() {
-  if (!initialized) {
-    db = require('../src/infrastructure/adapters/db/drizzle/connection').db;
-    schema = require('../src/infrastructure/adapters/db/drizzle/schema');
-    initialized = true;
+async function getAuth(db, schema) {
+  if (!db || !schema) {
+    throw new Error('getAuth requires db and schema parameters');
   }
-}
-
-async function getAuth() {
-  _requireDb();
   if (authInstance) return authInstance;
 
   const [{ betterAuth }, { drizzleAdapter }] = await Promise.all([
