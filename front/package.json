@@ -2,6 +2,7 @@
   "name": "bet-control-frontend",
   "version": "1.0.0",
   "private": true,
+  "type": "commonjs",
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",
