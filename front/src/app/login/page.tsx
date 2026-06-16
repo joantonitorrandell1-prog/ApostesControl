@@ -44,7 +44,7 @@ export default function LoginPage() {
         setError(signInError.message || 'Error de credencials.');
       } else {
         router.refresh();
-        router.push('/dashboard');
+        window.location.href = '/dashboard';
       }
     } catch (err: any) {
       setError('No s\'ha pogut connectar amb el servidor.');
