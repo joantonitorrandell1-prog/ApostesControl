@@ -1,7 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { getAuth } from 'better-auth-bridge';
-import { db } from '../../db/drizzle/connection';
-import * as schema from '../../db/drizzle/schema';
 
 // Extend Express Request type
 export interface AuthenticatedRequest extends Request {
@@ -17,6 +15,8 @@ export interface AuthenticatedRequest extends Request {
 
 export async function requireAuth(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   try {
+    const { db } = await import('../../db/drizzle/connection');
+    const schema = await import('../../db/drizzle/schema');
     const auth = await getAuth(db, schema);
     const session = await auth.api.getSession({
       headers: new Headers(req.headers as any),
