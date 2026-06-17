@@ -31,32 +31,7 @@ javascript:(function(){
         });
     });
 
-    let token = localStorage.getItem('auth_token');
-    if (!token) {
-        alert('🔒 Error: No hi ha sessió iniciada. Inicia sessió primer a la web de control.');
-        return;
-    }
-
-    fetch('https://apostes-control-back.vercel.app/api/apostes/importar', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + token
-        },
-        body: JSON.stringify({ apostes: llistaApostes })
-    })
-    .then(response => {
-        if (response.status === 401) {
-            alert('🔒 Error: La sessió ha expirat. Torna a iniciar sessió a la web de control.');
-        } else if (response.ok) {
-            return response.json().then(data => {
-                alert('✅ ' + data.message);
-            });
-        } else {
-            alert('❌ Error del servidor en processar les apostes.');
-        }
-    })
-    .catch(error => {
-        alert('🔌 Error de connexió amb el servidor.');
-    });
+    let dadesCodificades = btoa(encodeURIComponent(JSON.stringify(llistaApostes)));
+    let url = 'https://apostes-control-front.vercel.app/importar?data=' + dadesCodificades;
+    window.open(url, '_blank');
 })();

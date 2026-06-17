@@ -13,6 +13,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
 
   const isAuthPage = pathname === '/login';
   const isResetPage = pathname === '/reset-password';
+  const isImportPage = pathname === '/importar';
 
   useEffect(() => {
     if (!isPending) {
@@ -48,7 +49,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
   }
 
   // Auth pages don't show navigation shell
-  if (isAuthPage || isResetPage) {
+  if (isAuthPage || isResetPage || isImportPage) {
     return <div className="min-h-screen bg-background text-slate-100">{children}</div>;
   }
 
