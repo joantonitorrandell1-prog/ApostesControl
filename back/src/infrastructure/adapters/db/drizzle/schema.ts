@@ -75,6 +75,7 @@ export const bet = pgTable('bet', {
   id: text('id').primaryKey(),
   userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
   competitionId: text('competition_id').notNull().references(() => competition.id, { onDelete: 'cascade' }),
+  matchName: text('match_name'),
   amount: doublePrecision('amount').notNull(), // Float: Money invested
   odds: doublePrecision('odds').notNull(),     // Float: Odds/Quota
   earnings: doublePrecision('earnings').default(0).notNull(), // Float: Earnings (0 if lost or pending)

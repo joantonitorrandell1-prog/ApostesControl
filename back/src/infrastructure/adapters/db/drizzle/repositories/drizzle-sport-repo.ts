@@ -2,11 +2,18 @@ import { SportRepositoryPort } from '../../../../../domain/ports/sport-repositor
 import { SportEntity } from '../../../../../domain/entities/sport.entity.js';
 import { db } from '../connection.js';
 import { sport as sportTable } from '../schema.js';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 
 export class DrizzleSportRepository implements SportRepositoryPort {
   public async findById(id: string): Promise<SportEntity | null> {
     const records = await db.select().from(sportTable).where(eq(sportTable.id, id)).limit(1);
+    if (records.length === 0) return null;
+    const r = records[0];
+    return new SportEntity(r.id, r.name, r.userId, r.createdAt);
+  }
+
+  public async findByNameAndUserId(name: string, userId: string): Promise<SportEntity | null> {
+    const records = await db.select().from(sportTable).where(and(eq(sportTable.name, name), eq(sportTable.userId, userId))).limit(1);
     if (records.length === 0) return null;
     const r = records[0];
     return new SportEntity(r.id, r.name, r.userId, r.createdAt);

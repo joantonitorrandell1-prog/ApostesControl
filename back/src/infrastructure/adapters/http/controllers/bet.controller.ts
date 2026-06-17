@@ -108,13 +108,14 @@ export class BetController {
       const userId = req.user?.id;
       if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
-      const { competitionId, amount, odds, earnings, isBonusCredit, status, date } = req.body;
+      const { competitionId, amount, odds, earnings, isBonusCredit, status, date, matchName } = req.body;
       if (!competitionId || amount === undefined || odds === undefined || isBonusCredit === undefined || !status) {
         return res.status(400).json({ error: 'Missing required bet parameters' });
       }
 
       const bet = await this.betUseCase.createBet(userId, {
         competitionId,
+        matchName,
         amount: parseFloat(amount),
         odds: parseFloat(odds),
         earnings: earnings !== undefined ? parseFloat(earnings) : undefined,
@@ -174,6 +175,24 @@ export class BetController {
       return res.status(200).json({ message: 'Bet deleted successfully' });
     } catch (error: any) {
       return res.status(500).json({ error: error.message || 'Failed to delete bet' });
+    }
+  };
+
+  // --- IMPORT ---
+  public importBets = async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+      const { apostes } = req.body;
+      if (!Array.isArray(apostes) || apostes.length === 0) {
+        return res.status(400).json({ error: 'Cal proporcionar un array "apostes" amb almenys una aposta' });
+      }
+
+      const result = await this.betUseCase.importBets(userId, apostes);
+      return res.status(201).json({ message: `S\'han importat ${result.imported} apostes correctament`, count: result.imported, bets: result.bets });
+    } catch (error: any) {
+      return res.status(500).json({ error: error.message || 'Error al importar les apostes' });
     }
   };
 

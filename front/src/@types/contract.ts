@@ -52,6 +52,7 @@ export interface BetDTO {
   id: string;
   userId: string;
   competitionId: string;
+  matchName?: string;
   amount: number;
   odds: number;
   earnings: number;
@@ -63,6 +64,7 @@ export interface BetDTO {
 
 export interface CreateBetRequest {
   competitionId: string;
+  matchName?: string;
   amount: number;
   odds: number;
   earnings?: number;

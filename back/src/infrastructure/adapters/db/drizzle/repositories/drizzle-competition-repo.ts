@@ -2,11 +2,18 @@ import { CompetitionRepositoryPort } from '../../../../../domain/ports/competiti
 import { CompetitionEntity } from '../../../../../domain/entities/competition.entity.js';
 import { db } from '../connection.js';
 import { competition as competitionTable } from '../schema.js';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 
 export class DrizzleCompetitionRepository implements CompetitionRepositoryPort {
   public async findById(id: string): Promise<CompetitionEntity | null> {
     const records = await db.select().from(competitionTable).where(eq(competitionTable.id, id)).limit(1);
+    if (records.length === 0) return null;
+    const r = records[0];
+    return new CompetitionEntity(r.id, r.name, r.sportId, r.createdAt);
+  }
+
+  public async findByNameAndSportId(name: string, sportId: string): Promise<CompetitionEntity | null> {
+    const records = await db.select().from(competitionTable).where(and(eq(competitionTable.name, name), eq(competitionTable.sportId, sportId))).limit(1);
     if (records.length === 0) return null;
     const r = records[0];
     return new CompetitionEntity(r.id, r.name, r.sportId, r.createdAt);

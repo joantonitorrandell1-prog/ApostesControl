@@ -79,7 +79,8 @@ export class BetManagementUseCase {
       request.isBonusCredit,
       request.status,
       request.earnings,
-      request.date ? new Date(request.date) : new Date()
+      request.date ? new Date(request.date) : new Date(),
+      request.matchName
     );
     await this.betRepository.save(bet);
     return this.mapBetToDTO(bet);
@@ -213,6 +214,48 @@ export class BetManagementUseCase {
     };
   }
 
+  // --- IMPORT (from bookmarklet) ---
+  public async importBets(userId: string, apostes: Array<{ esport: string; competicio: string; detall?: string; quota: number; import: number }>): Promise<{ imported: number; bets: BetDTO[] }> {
+    const results: BetDTO[] = [];
+
+    for (const item of apostes) {
+      const sportName = item.esport || 'General';
+      const compName = item.competicio || 'General';
+
+      let sport = await this.sportRepository.findByNameAndUserId(sportName, userId);
+      if (!sport) {
+        const sportId = 'sport_' + Math.random().toString(36).substring(2, 11);
+        sport = SportEntity.create(sportId, sportName, userId);
+        await this.sportRepository.save(sport);
+      }
+
+      let competition = await this.competitionRepository.findByNameAndSportId(compName, sport.id);
+      if (!competition) {
+        const compId = 'comp_' + Math.random().toString(36).substring(2, 11);
+        competition = CompetitionEntity.create(compId, compName, sport.id);
+        await this.competitionRepository.save(competition);
+      }
+
+      const bet = BetEntity.create(
+        'bet_' + Math.random().toString(36).substring(2, 11),
+        userId,
+        competition.id,
+        item.import,
+        item.quota,
+        false,
+        'PENDING',
+        0,
+        new Date(),
+        item.detall
+      );
+
+      await this.betRepository.save(bet);
+      results.push(this.mapBetToDTO(bet));
+    }
+
+    return { imported: results.length, bets: results };
+  }
+
   // --- HELPERS ---
   private mapSportToDTO(sport: SportEntity): SportDTO {
     return {
@@ -237,6 +280,7 @@ export class BetManagementUseCase {
       id: bet.id,
       userId: bet.userId,
       competitionId: bet.competitionId,
+      matchName: bet.matchName,
       amount: bet.amount,
       odds: bet.odds,
       earnings: bet.earnings,

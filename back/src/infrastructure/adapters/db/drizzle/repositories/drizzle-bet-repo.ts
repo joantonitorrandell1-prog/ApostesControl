@@ -4,22 +4,25 @@ import { db } from '../connection.js';
 import { bet as betTable, competition as competitionTable, sport as sportTable } from '../schema.js';
 import { eq } from 'drizzle-orm';
 
+function mapRecordToEntity(r: any): BetEntity {
+  return new BetEntity(r.id, r.userId, r.competitionId, r.amount, r.odds, r.earnings, r.isBonusCredit, r.status, r.date, r.createdAt, r.matchName ?? undefined);
+}
+
 export class DrizzleBetRepository implements BetRepositoryPort {
   public async findById(id: string): Promise<BetEntity | null> {
     const records = await db.select().from(betTable).where(eq(betTable.id, id)).limit(1);
     if (records.length === 0) return null;
-    const r = records[0];
-    return new BetEntity(r.id, r.userId, r.competitionId, r.amount, r.odds, r.earnings, r.isBonusCredit, r.status, r.date, r.createdAt);
+    return mapRecordToEntity(records[0]);
   }
 
   public async findByUserId(userId: string): Promise<BetEntity[]> {
     const records = await db.select().from(betTable).where(eq(betTable.userId, userId));
-    return records.map(r => new BetEntity(r.id, r.userId, r.competitionId, r.amount, r.odds, r.earnings, r.isBonusCredit, r.status, r.date, r.createdAt));
+    return records.map(mapRecordToEntity);
   }
 
   public async findByCompetitionId(competitionId: string): Promise<BetEntity[]> {
     const records = await db.select().from(betTable).where(eq(betTable.competitionId, competitionId));
-    return records.map(r => new BetEntity(r.id, r.userId, r.competitionId, r.amount, r.odds, r.earnings, r.isBonusCredit, r.status, r.date, r.createdAt));
+    return records.map(mapRecordToEntity);
   }
 
   public async findBySportId(sportId: string): Promise<BetEntity[]> {
@@ -28,6 +31,7 @@ export class DrizzleBetRepository implements BetRepositoryPort {
         id: betTable.id,
         userId: betTable.userId,
         competitionId: betTable.competitionId,
+        matchName: betTable.matchName,
         amount: betTable.amount,
         odds: betTable.odds,
         earnings: betTable.earnings,
@@ -41,7 +45,7 @@ export class DrizzleBetRepository implements BetRepositoryPort {
       .innerJoin(sportTable, eq(competitionTable.sportId, sportTable.id))
       .where(eq(sportTable.id, sportId));
 
-    return records.map(r => new BetEntity(r.id, r.userId, r.competitionId, r.amount, r.odds, r.earnings, r.isBonusCredit, r.status, r.date, r.createdAt));
+    return records.map(mapRecordToEntity);
   }
 
   public async save(bet: BetEntity): Promise<void> {
@@ -56,6 +60,7 @@ export class DrizzleBetRepository implements BetRepositoryPort {
           isBonusCredit: bet.isBonusCredit,
           status: bet.status,
           date: bet.date,
+          matchName: bet.matchName ?? null,
         })
         .where(eq(betTable.id, bet.id));
     } else {
@@ -63,6 +68,7 @@ export class DrizzleBetRepository implements BetRepositoryPort {
         id: bet.id,
         userId: bet.userId,
         competitionId: bet.competitionId,
+        matchName: bet.matchName ?? null,
         amount: bet.amount,
         odds: bet.odds,
         earnings: bet.earnings,

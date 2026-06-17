@@ -11,7 +11,8 @@ export class BetEntity {
     public readonly isBonusCredit: boolean,
     public readonly status: BetStatus,
     public readonly date: Date,
-    public readonly createdAt: Date
+    public readonly createdAt: Date,
+    public readonly matchName?: string
   ) {}
 
   public static create(
@@ -23,7 +24,8 @@ export class BetEntity {
     isBonusCredit: boolean,
     status: BetStatus = 'PENDING',
     earnings = 0,
-    date = new Date()
+    date = new Date(),
+    matchName?: string
   ): BetEntity {
     // If status is WON, earnings = amount * odds. But wait! If it's bonus credit, net earnings = (amount * odds) - amount.
     // If status is LOST, earnings is 0.
@@ -46,7 +48,8 @@ export class BetEntity {
       isBonusCredit,
       status,
       date,
-      new Date()
+      new Date(),
+      matchName
     );
   }
 }

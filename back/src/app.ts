@@ -104,6 +104,8 @@ app.post('/api/bets', requireAuth, betController.createBet);
 app.patch('/api/bets/:id', requireAuth, betController.updateBetStatus);
 app.delete('/api/bets/:id', requireAuth, betController.deleteBet);
 
+app.post('/api/apostes/importar', requireAuth, betController.importBets);
+
 app.get('/api/stats', requireAuth, betController.getDashboardStats);
 
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
